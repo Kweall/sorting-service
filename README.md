@@ -61,9 +61,9 @@ DATABASE_DSN=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT
 
 ```sql
 CREATE TABLE IF NOT EXISTS numbers (
-    id SERIAL PRIMARY KEY,
-    value INTEGER NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    id serial PRIMARY KEY,
+    value integer NOT NULL,
+    created_at timestamp with time zone NOT NULL DEFAULT now()
 );
 ```
 
