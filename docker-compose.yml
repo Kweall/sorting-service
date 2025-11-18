@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5433:${POSTGRES_PORT}"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  migrations:
+    image: postgres:15
+    env_file:
+      - .env
+    depends_on:
+      - db
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGUSER: ${POSTGRES_USER}
+      PGHOST: db
+      PGDATABASE: ${POSTGRES_DB}
+    volumes:
+      - ./migrations:/migrations
+    entrypoint: ["sh", "-c", "until pg_isready -h db -p 5432; do echo 'db:5432 - no response'; sleep 1; done; psql -f /migrations/init.sql; echo 'Migrations complete'"]
+
+  app:
+    build: .
+    env_file:
+      - .env
+    environment:
+      DATABASE_DSN: ${DATABASE_DSN}
+      PORT: ${PORT}
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+
+volumes:
+  db-data:
