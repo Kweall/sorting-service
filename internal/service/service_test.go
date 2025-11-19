@@ -8,13 +8,13 @@ import (
 	"time"
 )
 
-type mockRepo struct {
+type dummyRepo struct {
 	inserted []int
 	list     []int
 	err      error
 }
 
-func (m *mockRepo) Insert(ctx context.Context, n int) error {
+func (m *dummyRepo) Insert(ctx context.Context, n int) error {
 	if m.err != nil {
 		return m.err
 	}
@@ -22,7 +22,7 @@ func (m *mockRepo) Insert(ctx context.Context, n int) error {
 	return nil
 }
 
-func (m *mockRepo) ListSorted(ctx context.Context) ([]int, error) {
+func (m *dummyRepo) ListSorted(ctx context.Context) ([]int, error) {
 	if m.err != nil {
 		return nil, m.err
 	}
@@ -30,7 +30,7 @@ func (m *mockRepo) ListSorted(ctx context.Context) ([]int, error) {
 }
 
 func TestAddNumber_Success(t *testing.T) {
-	m := &mockRepo{
+	m := &dummyRepo{
 		list: []int{1, 2, 3},
 	}
 	s := NewNumberService(m)
@@ -45,7 +45,7 @@ func TestAddNumber_Success(t *testing.T) {
 	}
 }
 func TestAddNumber_RepoError(t *testing.T) {
-	m := &mockRepo{err: errors.New("boom")}
+	m := &dummyRepo{err: errors.New("boom")}
 	s := NewNumberService(m)
 	ctx := context.Background()
 	_, err := s.AddNumber(ctx, 5)
